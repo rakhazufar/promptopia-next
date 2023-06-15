@@ -11,35 +11,41 @@ const handler = NextAuth({
             clientSecret: process.env.GOOGLE_CLIENT_SECRET,
         })
     ],
-    async session({session}) {
-        const sessionUser = await User.findOne({
-            email: session.user.email
-        })
-
-        session.user.id = sessionUser._id.toString();
-
-        return session;
-    },
-    async signIn({profile}) {
-        try {
-            connectToDB()
-                //check if user already exist or not
-                const userExists = await User.findOne({
-                    email: profile.email
-                })
-
-                //if not exist, create new user
-                if(!userExists) {
-                    await User.create({
-                        email: profile.email,
-                        username: profile.name.replace(" ", "").toLowerCase(),
-                        image: profile.picture
+    callbacks: {
+        async redirect({ url, baseUrl }) { return baseUrl },
+        async session({session}) {
+            const sessionUser = await User.findOne({
+                email: session.user.email
+            })
+    
+            session.user.id = sessionUser._id.toString();
+    
+            return session;
+        },
+        async signIn({profile}) {
+            try {
+                connectToDB()
+                    //check if user already exist or not
+                    console.log(profile)
+                    const userExists = await User.findOne({
+                        email: profile.email
                     })
-                }
-            return true;
-        } catch (error) {
-            console.log(error);
-            return false
+    
+                    //if not exist, create new user
+                    if(!userExists) {
+                        console.log("akan reg user")
+                        await User.create({
+                            email: profile.email,
+                            username: profile.name.replace(/\s/g, '').toLowerCase(),
+                            image: profile.picture
+                        })
+                        console.log("sudah reg user")
+                    }
+                return true;
+            } catch (error) {
+                console.log(error);
+                return false
+            }
         }
     }
 })
