@@ -1,12 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 
 import Form from '@components/Form'
 
-const createPrompt = () => {
+const CreatePrompt = () => {
     const router = useRouter()
     const {data: session} = useSession()
 
@@ -15,6 +15,13 @@ const createPrompt = () => {
         prompt: '',
         tag: ''
     })
+
+
+    useEffect(()=>{
+      if(!session) {
+        router.push("/")
+      }
+    }, [])
 
     const createPrompt = async (e)=>{
       e.preventDefault()
@@ -55,4 +62,4 @@ const createPrompt = () => {
   )
 }
 
-export default createPrompt
+export default CreatePrompt
