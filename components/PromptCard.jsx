@@ -3,13 +3,16 @@
 import {useState} from 'react'
 import Image from 'next/image'
 import { useSession } from 'next-auth/react'
-import { usePathname, useRouter } from 'next/navigation'
+import { usePathname, useRouter, useParams } from 'next/navigation'
+import Copy from "@public/assets/icons/copy.svg"
+import Tick from "@public/assets/icons/tick.svg"
 
 const PromptCard = ({ post, handleTagClick, handleEdit, handleDelete }) => {
   const [copied, setCopied] = useState("")
   const { data: session } = useSession()
   const pathName = usePathname()
   const router  = useRouter()
+  const params = useParams()
 
   //function to copy prompt to the clipboard
   const handleCopy = ()=>{
@@ -18,10 +21,14 @@ const PromptCard = ({ post, handleTagClick, handleEdit, handleDelete }) => {
     setTimeout(()=>setCopied(""), 5000)
   }
 
+  const handleClickProfile = () => {
+    router.push(`/profile/${post.creator._id}?name=${post.creator.username}`)
+  }
+
   return (
     <div className='prompt_card'>
       <div className="flex justify-between items-start gap-5">
-          <div className='flex-1 flex justify-start items-center gap-3 cursor-pointer'>
+          <div className='flex-1 flex justify-start items-center gap-3 cursor-pointer' onClick={()=>handleClickProfile()}>
             <Image
             src={post.creator.image}
             alt='user_image'
@@ -42,8 +49,8 @@ const PromptCard = ({ post, handleTagClick, handleEdit, handleDelete }) => {
           <div className="copy_btn" onClick={handleCopy}>
             <Image 
               src={ copied === post.prompt
-                    ? 'assets/icons/tick.svg'
-                    : 'assets/icons/copy.svg'
+                    ? Tick
+                    : Copy
                   }
               width={12}
               alt="copy-button"
